@@ -18,64 +18,42 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState(null);
-  const [userPhotoPreview, setUserPhotoPreview] = useState(null);
   const [partnerPhoto, setPartnerPhoto] = useState(null);
-  const [partnerPhotoPreview, setPartnerPhotoPreview] = useState(null);
   const [apiError, setApiError] = useState('');
   const { register, handleSubmit, trigger, formState: { errors } } = useForm({ resolver: zodResolver(registerSchema), mode: 'onChange' });
   const userFields = ['nom','prenom','age','pays','ville','quartier','nomMere','nomPere','nomAine','nomBenjamin'];
   const partnerFields = ['partnerNom','partnerPrenom','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin'];
-  const nextStep = async () => {
-    const fields = step === 1 ? userFields : partnerFields;
-    const valid = await trigger(fields);
-    if (valid) { setApiError(''); setStep(s => s + 1); }
-  };
-  const handleUserPhoto = (file, preview) => { setUserPhoto(file); setUserPhotoPreview(preview); };
-  const handlePartnerPhoto = (file, preview) => { setPartnerPhoto(file); setPartnerPhotoPreview(preview); };
+  const nextStep = async () => { const fields = step === 1 ? userFields : partnerFields; const valid = await trigger(fields); if (valid) { setApiError(''); setStep(s => s + 1); } };
   const onSubmit = async (data) => {
-    setLoading(true);
-    setApiError('');
+    setLoading(true); setApiError('');
     try {
       const formData = new FormData();
-      const fields = ['email','password','nom','prenom','age','pays','ville','quartier','religion','niveauEtude','profession','nomMere','nomPere','nomAine','nomBenjamin','partnerNom','partnerPrenom','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerReligion','partnerNiveauEtude','partnerProfession','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin','dateRencontre','lieuRencontre'];
-      fields.forEach(key => { if (data[key] !== undefined && data[key] !== null && data[key] !== '') formData.append(key, String(data[key])); });
+      const allFields = ['email','password','nom','prenom','age','pays','ville','quartier','religion','niveauEtude','profession','nomMere','nomPere','nomAine','nomBenjamin','partnerNom','partnerPrenom','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerReligion','partnerNiveauEtude','partnerProfession','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin','dateRencontre','lieuRencontre'];
+      allFields.forEach(key => { if (data[key] !== undefined && data[key] !== null && data[key] !== '') formData.append(key, String(data[key])); });
       if (userPhoto) formData.append('photo', userPhoto);
       if (partnerPhoto) formData.append('partnerPhoto', partnerPhoto);
       await authRegister(formData);
       toast.success('Compte créé avec succès !');
       navigate(ROUTES.DASHBOARD);
-    } catch (e) {
-      const msg = e.message || 'Une erreur est survenue lors de l\'inscription';
-      setApiError(msg);
-      toast.error(msg);
-      if (msg.toLowerCase().includes('email')) setStep(3);
-    } finally { setLoading(false); }
+    } catch (e) { const msg = e.message || 'Une erreur est survenue'; setApiError(msg); toast.error(msg); if (msg.toLowerCase().includes('email')) setStep(3); }
+    finally { setLoading(false); }
   };
-  const getAutoComplete = (name) => ({ nom:'family-name', prenom:'given-name', pays:'country-name', ville:'address-level2', profession:'organization-title' }[name] || 'off');
-  const Field = ({ label, name, type = 'text', placeholder, required = false }) => (
-    <div>
-      <label className="label" htmlFor={`reg-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
-      <input {...register(name)} id={`reg-${name}`} type={type} placeholder={placeholder} autoComplete={getAutoComplete(name)} className={`input ${errors[name] ? 'input-error' : ''}`} />
-      {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}
-    </div>
+  const getAC = (n) => ({ nom:'family-name', prenom:'given-name', pays:'country-name', ville:'address-level2', profession:'organization-title' }[n] || 'off');
+  const F = ({ label, name, type = 'text', placeholder, required = false }) => (
+    <div><label className="label" htmlFor={`r-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
+    <input {...register(name)} id={`r-${name}`} type={type} placeholder={placeholder} autoComplete={getAC(name)} className={`input ${errors[name] ? 'input-error' : ''}`} />
+    {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}</div>
   );
-  const SelectField = ({ label, name, options, required = false }) => (
-    <div>
-      <label className="label" htmlFor={`reg-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
-      <select {...register(name)} id={`reg-${name}`} autoComplete="off" className={`input ${errors[name] ? 'input-error' : ''}`}>
-        <option value="">Choisir...</option>
-        {options.map(o => <option key={o} value={o}>{o}</option>)}
-      </select>
-      {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}
-    </div>
+  const S = ({ label, name, options, required = false }) => (
+    <div><label className="label" htmlFor={`r-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
+    <select {...register(name)} id={`r-${name}`} autoComplete="off" className={`input ${errors[name] ? 'input-error' : ''}`}><option value="">Choisir...</option>{options.map(o => <option key={o} value={o}>{o}</option>)}</select>
+    {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}</div>
   );
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-primary-200">
-            <span className="text-white text-xl font-bold">MF</span>
-          </div>
+          <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg"><span className="text-white text-xl font-bold">MF</span></div>
           <h1 className="text-2xl font-bold text-gray-900">Créer un compte</h1>
           <p className="text-gray-500 mt-1 text-sm">Renseignez vos informations et celles de votre partenaire</p>
         </div>
@@ -95,118 +73,54 @@ export default function RegisterPage() {
           <div className="card shadow-xl border border-gray-100">
             {step === 1 && (
               <div className="space-y-5">
-                <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-                  <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-xl">👤</div>
-                  <div><h2 className="font-semibold text-gray-900">Vos informations personnelles</h2><p className="text-xs text-gray-500">Informations vous concernant directement</p></div>
-                </div>
-                <div className="flex justify-center">
-                  <PhotoUpload label="Votre photo (optionnel)" onChange={handleUserPhoto} previewUrl={userPhotoPreview} />
-                </div>
+                <div className="flex items-center gap-3 pb-4 border-b border-gray-100"><div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-xl">👤</div><div><h2 className="font-semibold text-gray-900">Vos informations personnelles</h2><p className="text-xs text-gray-500">Informations vous concernant directement</p></div></div>
+                <div className="flex justify-center"><PhotoUpload label="Votre photo (optionnel)" onChange={setUserPhoto} initialPreview={null} /></div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field label="Nom" name="nom" placeholder="Votre nom de famille" required />
-                  <Field label="Prénom" name="prenom" placeholder="Votre prénom" required />
-                  <Field label="Age" name="age" type="number" placeholder="Ex: 28" required />
-                  <SelectField label="Pays" name="pays" options={PAYS} required />
-                  <Field label="Ville" name="ville" placeholder="Votre ville" required />
-                  <Field label="Quartier" name="quartier" placeholder="Votre quartier" required />
-                  <SelectField label="Religion" name="religion" options={RELIGIONS} />
-                  <SelectField label="Niveau d'étude" name="niveauEtude" options={ETUDES} />
-                  <Field label="Profession" name="profession" placeholder="Votre métier" />
+                  <F label="Nom" name="nom" placeholder="Votre nom de famille" required /><F label="Prénom" name="prenom" placeholder="Votre prénom" required />
+                  <F label="Age" name="age" type="number" placeholder="Ex: 28" required /><S label="Pays" name="pays" options={PAYS} required />
+                  <F label="Ville" name="ville" placeholder="Votre ville" required /><F label="Quartier" name="quartier" placeholder="Votre quartier" required />
+                  <S label="Religion" name="religion" options={RELIGIONS} /><S label="Niveau d'étude" name="niveauEtude" options={ETUDES} />
+                  <F label="Profession" name="profession" placeholder="Votre métier" />
                 </div>
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                  <p className="text-xs font-semibold text-blue-800 mb-3">Informations familiales <span className="text-red-500">*</span></p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Field label="Nom complet de votre mère" name="nomMere" placeholder="Prénom et nom" required />
-                    <Field label="Nom complet de votre père" name="nomPere" placeholder="Prénom et nom" required />
-                    <Field label="Nom de l'aîné de la famille" name="nomAine" placeholder="Prénom et nom" required />
-                    <Field label="Nom du benjamin de la famille" name="nomBenjamin" placeholder="Prénom et nom" required />
-                  </div>
+                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100"><p className="text-xs font-semibold text-blue-800 mb-3">Informations familiales <span className="text-red-500">*</span></p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><F label="Nom complet de votre mère" name="nomMere" placeholder="Prénom et nom" required /><F label="Nom complet de votre père" name="nomPere" placeholder="Prénom et nom" required /><F label="Nom de l'aîné de la famille" name="nomAine" placeholder="Prénom et nom" required /><F label="Nom du benjamin de la famille" name="nomBenjamin" placeholder="Prénom et nom" required /></div>
                 </div>
                 <Button type="button" onClick={nextStep} className="w-full" size="lg">Suivant — Informations partenaire →</Button>
               </div>
             )}
             {step === 2 && (
               <div className="space-y-5">
-                <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-                  <div className="w-10 h-10 bg-secondary-100 rounded-xl flex items-center justify-center text-xl">💑</div>
-                  <div><h2 className="font-semibold text-gray-900">Informations du partenaire</h2><p className="text-xs text-gray-500">Informations concernant votre partenaire</p></div>
-                </div>
-                <div className="flex justify-center">
-                  <PhotoUpload label="Photo du partenaire (optionnel)" onChange={handlePartnerPhoto} previewUrl={partnerPhotoPreview} />
-                </div>
+                <div className="flex items-center gap-3 pb-4 border-b border-gray-100"><div className="w-10 h-10 bg-secondary-100 rounded-xl flex items-center justify-center text-xl">💑</div><div><h2 className="font-semibold text-gray-900">Informations du partenaire</h2><p className="text-xs text-gray-500">Informations concernant votre partenaire</p></div></div>
+                <div className="flex justify-center"><PhotoUpload label="Photo du partenaire (optionnel)" onChange={setPartnerPhoto} initialPreview={null} /></div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field label="Nom du partenaire" name="partnerNom" placeholder="Son nom de famille" required />
-                  <Field label="Prénom du partenaire" name="partnerPrenom" placeholder="Son prénom" required />
-                  <Field label="Age du partenaire" name="partnerAge" type="number" placeholder="Ex: 30" required />
-                  <SelectField label="Pays du partenaire" name="partnerPays" options={PAYS} required />
-                  <Field label="Ville du partenaire" name="partnerVille" placeholder="Sa ville" required />
-                  <Field label="Quartier du partenaire" name="partnerQuartier" placeholder="Son quartier" required />
-                  <SelectField label="Religion" name="partnerReligion" options={RELIGIONS} />
-                  <SelectField label="Niveau d'étude" name="partnerNiveauEtude" options={ETUDES} />
-                  <Field label="Profession" name="partnerProfession" placeholder="Son métier" />
+                  <F label="Nom du partenaire" name="partnerNom" placeholder="Son nom de famille" required /><F label="Prénom du partenaire" name="partnerPrenom" placeholder="Son prénom" required />
+                  <F label="Age du partenaire" name="partnerAge" type="number" placeholder="Ex: 30" required /><S label="Pays du partenaire" name="partnerPays" options={PAYS} required />
+                  <F label="Ville du partenaire" name="partnerVille" placeholder="Sa ville" required /><F label="Quartier du partenaire" name="partnerQuartier" placeholder="Son quartier" required />
+                  <S label="Religion" name="partnerReligion" options={RELIGIONS} /><S label="Niveau d'étude" name="partnerNiveauEtude" options={ETUDES} />
+                  <F label="Profession" name="partnerProfession" placeholder="Son métier" />
                 </div>
-                <div className="bg-pink-50 rounded-xl p-4 border border-pink-100">
-                  <p className="text-xs font-semibold text-pink-800 mb-3">Informations familiales du partenaire <span className="text-red-500">*</span></p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Field label="Nom complet de sa mère" name="partnerNomMere" placeholder="Prénom et nom" required />
-                    <Field label="Nom complet de son père" name="partnerNomPere" placeholder="Prénom et nom" required />
-                    <Field label="Nom de l'aîné de sa famille" name="partnerNomAine" placeholder="Prénom et nom" required />
-                    <Field label="Nom du benjamin de sa famille" name="partnerNomBenjamin" placeholder="Prénom et nom" required />
-                  </div>
+                <div className="bg-pink-50 rounded-xl p-4 border border-pink-100"><p className="text-xs font-semibold text-pink-800 mb-3">Informations familiales du partenaire <span className="text-red-500">*</span></p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><F label="Nom complet de sa mère" name="partnerNomMere" placeholder="Prénom et nom" required /><F label="Nom complet de son père" name="partnerNomPere" placeholder="Prénom et nom" required /><F label="Nom de l'aîné de sa famille" name="partnerNomAine" placeholder="Prénom et nom" required /><F label="Nom du benjamin de sa famille" name="partnerNomBenjamin" placeholder="Prénom et nom" required /></div>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                  <p className="text-xs font-semibold text-gray-600 mb-3">Informations sur votre rencontre (optionnel)</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="label" htmlFor="reg-dateRencontre">Date de la rencontre</label>
-                      <input {...register('dateRencontre')} id="reg-dateRencontre" type="date" autoComplete="off" className="input" />
-                    </div>
-                    <Field label="Lieu de la rencontre" name="lieuRencontre" placeholder="Ville, lieu..." />
-                  </div>
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200"><p className="text-xs font-semibold text-gray-600 mb-3">Informations sur votre rencontre (optionnel)</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label className="label" htmlFor="r-dateRencontre">Date de la rencontre</label><input {...register('dateRencontre')} id="r-dateRencontre" type="date" autoComplete="off" className="input" /></div><F label="Lieu de la rencontre" name="lieuRencontre" placeholder="Ville, lieu..." /></div>
                 </div>
-                <div className="flex gap-3">
-                  <Button type="button" variant="secondary" onClick={() => setStep(1)} className="flex-1">← Retour</Button>
-                  <Button type="button" onClick={nextStep} className="flex-1" size="lg">Suivant — Créer le compte →</Button>
-                </div>
+                <div className="flex gap-3"><Button type="button" variant="secondary" onClick={() => setStep(1)} className="flex-1">← Retour</Button><Button type="button" onClick={nextStep} className="flex-1" size="lg">Suivant — Créer le compte →</Button></div>
               </div>
             )}
             {step === 3 && (
               <div className="space-y-5">
-                <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-xl">🔐</div>
-                  <div><h2 className="font-semibold text-gray-900">Créer votre compte</h2><p className="text-xs text-gray-500">Email et mot de passe pour vous connecter</p></div>
-                </div>
+                <div className="flex items-center gap-3 pb-4 border-b border-gray-100"><div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-xl">🔐</div><div><h2 className="font-semibold text-gray-900">Créer votre compte</h2><p className="text-xs text-gray-500">Email et mot de passe pour vous connecter</p></div></div>
                 <div className="space-y-4">
-                  <div>
-                    <label className="label" htmlFor="reg-email">Adresse email <span className="text-red-500">*</span></label>
-                    <input {...register('email')} id="reg-email" type="email" placeholder="votre@email.com" autoComplete="email" className={`input ${errors.email ? 'input-error' : ''}`} />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
-                  </div>
-                  <div>
-                    <label className="label" htmlFor="reg-password">Mot de passe <span className="text-red-500">*</span></label>
-                    <input {...register('password')} id="reg-password" type="password" placeholder="Minimum 6 caractères" autoComplete="new-password" className={`input ${errors.password ? 'input-error' : ''}`} />
-                    {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-                  </div>
-                  <div>
-                    <label className="label" htmlFor="reg-confirm">Confirmer le mot de passe <span className="text-red-500">*</span></label>
-                    <input {...register('confirmPassword')} id="reg-confirm" type="password" placeholder="Répétez le mot de passe" autoComplete="new-password" className={`input ${errors.confirmPassword ? 'input-error' : ''}`} />
-                    {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
-                  </div>
+                  <div><label className="label" htmlFor="r-email">Adresse email <span className="text-red-500">*</span></label><input {...register('email')} id="r-email" type="email" placeholder="votre@email.com" autoComplete="email" className={`input ${errors.email ? 'input-error' : ''}`} />{errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}</div>
+                  <div><label className="label" htmlFor="r-password">Mot de passe <span className="text-red-500">*</span></label><input {...register('password')} id="r-password" type="password" placeholder="Minimum 6 caractères" autoComplete="new-password" className={`input ${errors.password ? 'input-error' : ''}`} />{errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}</div>
+                  <div><label className="label" htmlFor="r-confirm">Confirmer le mot de passe <span className="text-red-500">*</span></label><input {...register('confirmPassword')} id="r-confirm" type="password" placeholder="Répétez le mot de passe" autoComplete="new-password" className={`input ${errors.confirmPassword ? 'input-error' : ''}`} />{errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}</div>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                  <h4 className="text-xs font-semibold text-gray-600 mb-3">Récapitulatif</h4>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
-                    <div className="flex items-center gap-1"><span className={userPhotoPreview ? 'text-green-500' : 'text-gray-300'}>●</span>Votre photo {userPhotoPreview ? '✓' : '(non ajoutée)'}</div>
-                    <div className="flex items-center gap-1"><span className={partnerPhotoPreview ? 'text-green-500' : 'text-gray-300'}>●</span>Photo partenaire {partnerPhotoPreview ? '✓' : '(non ajoutée)'}</div>
-                  </div>
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100"><h4 className="text-xs font-semibold text-gray-600 mb-2">Photos sélectionnées</h4>
+                  <div className="flex gap-4 text-xs"><span className={userPhoto ? 'text-green-600 font-medium' : 'text-gray-400'}>{userPhoto ? '✓ Votre photo' : '— Sans photo (vous)'}</span><span className={partnerPhoto ? 'text-green-600 font-medium' : 'text-gray-400'}>{partnerPhoto ? '✓ Photo partenaire' : '— Sans photo (partenaire)'}</span></div>
                 </div>
-                <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-                  <p className="text-xs text-green-700">🔒 Vos données sont chiffrées et strictement confidentielles. Elles ne seront jamais vendues à des tiers.</p>
-                </div>
-                <div className="flex gap-3">
-                  <Button type="button" variant="secondary" onClick={() => setStep(2)} className="flex-1">← Retour</Button>
-                  <Button type="submit" loading={loading} className="flex-1" size="lg">Créer mon compte ✓</Button>
-                </div>
+                <div className="bg-green-50 rounded-xl p-4 border border-green-100"><p className="text-xs text-green-700">🔒 Vos données sont chiffrées et strictement confidentielles.</p></div>
+                <div className="flex gap-3"><Button type="button" variant="secondary" onClick={() => setStep(2)} className="flex-1">← Retour</Button><Button type="submit" loading={loading} className="flex-1" size="lg">Créer mon compte ✓</Button></div>
               </div>
             )}
           </div>
