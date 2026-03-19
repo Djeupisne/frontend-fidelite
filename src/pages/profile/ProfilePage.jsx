@@ -9,9 +9,14 @@ import Modal from '../../components/common/Modal.jsx';
 import { userApi } from '../../services/user.api.js';
 import { formatDate, getInitials } from '../../utils/formatters.js';
 import toast from 'react-hot-toast';
-const FIELD_LABELS = { nom: 'Nom', prenom: 'Prénom', age: 'Age', pays: 'Pays', ville: 'Ville', quartier: 'Quartier', religion: 'Religion', niveauEtude: "Niveau d'étude", profession: 'Profession', nomMere: 'Nom de la mère', nomPere: 'Nom du père', nomAine: "Nom de l'aîné", nomBenjamin: 'Nom du benjamin', email: 'Email' };
+const FIELD_LABELS = { nom:'Nom', prenom:'Prénom', age:'Age', pays:'Pays', ville:'Ville', quartier:'Quartier', religion:'Religion', niveauEtude:"Niveau d'étude", profession:'Profession', nomMere:'Nom de la mère', nomPere:'Nom du père', nomAine:"Nom de l'aîné", nomBenjamin:'Nom du benjamin' };
+const SafeAvatar = ({ photo, nom, prenom }) => {
+  const [err, setErr] = useState(false);
+  if (photo && photo !== '' && !err) return <img src={photo} alt="" className="w-20 h-20 rounded-2xl object-cover shadow-md" onError={() => setErr(true)} />;
+  return <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center text-primary-700 font-bold text-2xl shadow-md">{getInitials(nom, prenom)}</div>;
+};
 export default function ProfilePage() {
-  const { user, updateUser, loadUser } = useAuth();
+  const { user, loadUser } = useAuth();
   const [pwdModal, setPwdModal] = useState(false);
   const [loadingPwd, setLoadingPwd] = useState(false);
   const [pwdData, setPwdData] = useState({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
@@ -23,7 +28,6 @@ export default function ProfilePage() {
     catch (e) { toast.error(e.message); }
     finally { setLoadingPwd(false); }
   };
-  const fields = Object.entries(FIELD_LABELS).filter(([k]) => k !== 'email');
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
@@ -34,7 +38,7 @@ export default function ProfilePage() {
         </div>
         <div className="card mb-6">
           <div className="flex items-center gap-5">
-            {user?.photo ? <img src={user.photo} alt="" className="w-20 h-20 rounded-2xl object-cover shadow-md" /> : <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center text-primary-700 font-bold text-2xl shadow-md">{getInitials(user?.nom, user?.prenom)}</div>}
+            <SafeAvatar photo={user?.photo} nom={user?.nom} prenom={user?.prenom} />
             <div>
               <h2 className="text-xl font-bold text-gray-900">{user?.prenom} {user?.nom}</h2>
               <p className="text-gray-500 text-sm">{user?.email}</p>
@@ -45,7 +49,7 @@ export default function ProfilePage() {
         <div className="card mb-6">
           <h3 className="font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">Informations personnelles</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {fields.map(([key, label]) => (
+            {Object.entries(FIELD_LABELS).map(([key, label]) => (
               <div key={key} className="bg-gray-50 rounded-xl p-3">
                 <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-1">{label}</p>
                 <p className="text-sm font-medium text-gray-800">{user?.[key] || '—'}</p>
@@ -56,14 +60,14 @@ export default function ProfilePage() {
         <div className="card">
           <h3 className="font-semibold text-gray-900 mb-4">Sécurité</h3>
           <div className="flex items-center justify-between py-3 border-b border-gray-100">
-            <div><p className="text-sm font-medium text-gray-700">Mot de passe</p><p className="text-xs text-gray-400">Dernière modification inconnue</p></div>
+            <div><p className="text-sm font-medium text-gray-700">Mot de passe</p><p className="text-xs text-gray-400">Modifier votre mot de passe de connexion</p></div>
             <Button variant="secondary" size="sm" onClick={() => setPwdModal(true)}>Modifier</Button>
           </div>
         </div>
         <Modal isOpen={pwdModal} onClose={() => setPwdModal(false)} title="Modifier le mot de passe">
           <form onSubmit={handlePasswordChange} className="space-y-4">
-            {[['currentPassword','Mot de passe actuel'],['newPassword','Nouveau mot de passe'],['confirmNewPassword','Confirmer le nouveau']].map(([k,l]) => (
-              <div key={k}><label className="label">{l}</label><input type="password" value={pwdData[k]} onChange={e => setPwdData(p => ({...p,[k]:e.target.value}))} placeholder="••••••••" className="input" required /></div>
+            {[['currentPassword','Mot de passe actuel','current-password'],['newPassword','Nouveau mot de passe','new-password'],['confirmNewPassword','Confirmer le nouveau','new-password']].map(([k,l,ac]) => (
+              <div key={k}><label className="label">{l}</label><input type="password" value={pwdData[k]} onChange={e => setPwdData(p => ({...p,[k]:e.target.value}))} placeholder="••••••••" autoComplete={ac} className="input" required /></div>
             ))}
             <div className="flex gap-3 pt-2">
               <Button type="button" variant="secondary" onClick={() => setPwdModal(false)} className="flex-1">Annuler</Button>
