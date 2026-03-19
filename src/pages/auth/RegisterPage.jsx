@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,43 +18,51 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState(null);
+  const [userPhotoPreview, setUserPhotoPreview] = useState(null);
   const [partnerPhoto, setPartnerPhoto] = useState(null);
+  const [partnerPhotoPreview, setPartnerPhotoPreview] = useState(null);
+  const [apiError, setApiError] = useState('');
   const { register, handleSubmit, trigger, formState: { errors } } = useForm({ resolver: zodResolver(registerSchema), mode: 'onChange' });
-  const userFields = ['nom','prenom','age','pays','ville','quartier','religion','niveauEtude','profession','nomMere','nomPere','nomAine','nomBenjamin'];
-  const partnerFields = ['partnerNom','partnerPrenom','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerReligion','partnerNiveauEtude','partnerProfession','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin'];
+  const userFields = ['nom','prenom','age','pays','ville','quartier','nomMere','nomPere','nomAine','nomBenjamin'];
+  const partnerFields = ['partnerNom','partnerPrenom','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin'];
   const nextStep = async () => {
     const fields = step === 1 ? userFields : partnerFields;
     const valid = await trigger(fields);
-    if (valid) setStep(s => s + 1);
+    if (valid) { setApiError(''); setStep(s => s + 1); }
   };
+  const handleUserPhoto = (file, preview) => { setUserPhoto(file); setUserPhotoPreview(preview); };
+  const handlePartnerPhoto = (file, preview) => { setPartnerPhoto(file); setPartnerPhotoPreview(preview); };
   const onSubmit = async (data) => {
     setLoading(true);
+    setApiError('');
     try {
       const formData = new FormData();
-      Object.entries(data).forEach(([k, v]) => { if (v !== undefined && v !== '') formData.append(k, v); });
+      const fields = ['email','password','nom','prenom','age','pays','ville','quartier','religion','niveauEtude','profession','nomMere','nomPere','nomAine','nomBenjamin','partnerNom','partnerPrenom','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerReligion','partnerNiveauEtude','partnerProfession','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin','dateRencontre','lieuRencontre'];
+      fields.forEach(key => { if (data[key] !== undefined && data[key] !== null && data[key] !== '') formData.append(key, String(data[key])); });
       if (userPhoto) formData.append('photo', userPhoto);
       if (partnerPhoto) formData.append('partnerPhoto', partnerPhoto);
       await authRegister(formData);
       toast.success('Compte créé avec succès !');
       navigate(ROUTES.DASHBOARD);
-    } catch (e) { toast.error(e.message || 'Erreur lors de l\'inscription'); setStep(1); }
-    finally { setLoading(false); }
+    } catch (e) {
+      const msg = e.message || 'Une erreur est survenue lors de l\'inscription';
+      setApiError(msg);
+      toast.error(msg);
+      if (msg.toLowerCase().includes('email')) setStep(3);
+    } finally { setLoading(false); }
   };
-  const getAutoComplete = (name) => {
-    const map = { nom:'family-name', prenom:'given-name', age:'off', pays:'country-name', ville:'address-level2', quartier:'off', religion:'off', niveauEtude:'off', profession:'organization-title', nomMere:'off', nomPere:'off', nomAine:'off', nomBenjamin:'off' };
-    return map[name] || 'off';
-  };
+  const getAutoComplete = (name) => ({ nom:'family-name', prenom:'given-name', pays:'country-name', ville:'address-level2', profession:'organization-title' }[name] || 'off');
   const Field = ({ label, name, type = 'text', placeholder, required = false }) => (
     <div>
-      <label className="label" htmlFor={name}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
-      <input {...register(name)} id={name} type={type} placeholder={placeholder} autoComplete={getAutoComplete(name)} className={`input ${errors[name] ? 'input-error' : ''}`} />
+      <label className="label" htmlFor={`reg-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
+      <input {...register(name)} id={`reg-${name}`} type={type} placeholder={placeholder} autoComplete={getAutoComplete(name)} className={`input ${errors[name] ? 'input-error' : ''}`} />
       {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}
     </div>
   );
   const SelectField = ({ label, name, options, required = false }) => (
     <div>
-      <label className="label" htmlFor={name}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
-      <select {...register(name)} id={name} autoComplete="off" className={`input ${errors[name] ? 'input-error' : ''}`}>
+      <label className="label" htmlFor={`reg-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
+      <select {...register(name)} id={`reg-${name}`} autoComplete="off" className={`input ${errors[name] ? 'input-error' : ''}`}>
         <option value="">Choisir...</option>
         {options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
@@ -75,22 +83,25 @@ export default function RegisterPage() {
           {STEPS.map((s, i) => (
             <React.Fragment key={s.id}>
               <div className={`flex items-center gap-2 ${step >= s.id ? 'text-primary-600' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${step > s.id ? 'bg-primary-600 border-primary-600 text-white' : step === s.id ? 'border-primary-600 text-primary-600' : 'border-gray-300 text-gray-400'}`}>{step > s.id ? '✓' : s.id}</div>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${step > s.id ? 'bg-primary-600 border-primary-600 text-white' : step === s.id ? 'border-primary-600 text-primary-600 bg-primary-50' : 'border-gray-300 text-gray-400'}`}>{step > s.id ? '✓' : s.id}</div>
                 <span className="hidden sm:block text-sm font-medium">{s.label}</span>
               </div>
               {i < STEPS.length - 1 && <div className={`flex-1 h-0.5 max-w-16 rounded ${step > s.id ? 'bg-primary-600' : 'bg-gray-200'}`} />}
             </React.Fragment>
           ))}
         </div>
+        {apiError && <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">{apiError}</div>}
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           <div className="card shadow-xl border border-gray-100">
             {step === 1 && (
               <div className="space-y-5">
                 <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
                   <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-xl">👤</div>
-                  <div><h2 className="font-semibold text-gray-900">Vos informations personnelles</h2><p className="text-xs text-gray-500">Ces informations vous concernent</p></div>
+                  <div><h2 className="font-semibold text-gray-900">Vos informations personnelles</h2><p className="text-xs text-gray-500">Informations vous concernant directement</p></div>
                 </div>
-                <div className="flex justify-center"><PhotoUpload label="Votre photo" name="photo" onChange={setUserPhoto} /></div>
+                <div className="flex justify-center">
+                  <PhotoUpload label="Votre photo (optionnel)" onChange={handleUserPhoto} previewUrl={userPhotoPreview} />
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field label="Nom" name="nom" placeholder="Votre nom de famille" required />
                   <Field label="Prénom" name="prenom" placeholder="Votre prénom" required />
@@ -111,16 +122,18 @@ export default function RegisterPage() {
                     <Field label="Nom du benjamin de la famille" name="nomBenjamin" placeholder="Prénom et nom" required />
                   </div>
                 </div>
-                <Button type="button" onClick={nextStep} className="w-full" size="lg">Suivant — Mon partenaire →</Button>
+                <Button type="button" onClick={nextStep} className="w-full" size="lg">Suivant — Informations partenaire →</Button>
               </div>
             )}
             {step === 2 && (
               <div className="space-y-5">
                 <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
                   <div className="w-10 h-10 bg-secondary-100 rounded-xl flex items-center justify-center text-xl">💑</div>
-                  <div><h2 className="font-semibold text-gray-900">Informations du partenaire</h2><p className="text-xs text-gray-500">Ces informations concernent votre partenaire</p></div>
+                  <div><h2 className="font-semibold text-gray-900">Informations du partenaire</h2><p className="text-xs text-gray-500">Informations concernant votre partenaire</p></div>
                 </div>
-                <div className="flex justify-center"><PhotoUpload label="Photo du partenaire" name="partnerPhoto" onChange={setPartnerPhoto} /></div>
+                <div className="flex justify-center">
+                  <PhotoUpload label="Photo du partenaire (optionnel)" onChange={handlePartnerPhoto} previewUrl={partnerPhotoPreview} />
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field label="Nom du partenaire" name="partnerNom" placeholder="Son nom de famille" required />
                   <Field label="Prénom du partenaire" name="partnerPrenom" placeholder="Son prénom" required />
@@ -144,13 +157,16 @@ export default function RegisterPage() {
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <p className="text-xs font-semibold text-gray-600 mb-3">Informations sur votre rencontre (optionnel)</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div><label className="label" htmlFor="dateRencontre">Date de la rencontre</label><input {...register('dateRencontre')} id="dateRencontre" type="date" autoComplete="off" className="input" /></div>
+                    <div>
+                      <label className="label" htmlFor="reg-dateRencontre">Date de la rencontre</label>
+                      <input {...register('dateRencontre')} id="reg-dateRencontre" type="date" autoComplete="off" className="input" />
+                    </div>
                     <Field label="Lieu de la rencontre" name="lieuRencontre" placeholder="Ville, lieu..." />
                   </div>
                 </div>
                 <div className="flex gap-3">
                   <Button type="button" variant="secondary" onClick={() => setStep(1)} className="flex-1">← Retour</Button>
-                  <Button type="button" onClick={nextStep} className="flex-1" size="lg">Suivant — Compte →</Button>
+                  <Button type="button" onClick={nextStep} className="flex-1" size="lg">Suivant — Créer le compte →</Button>
                 </div>
               </div>
             )}
@@ -175,6 +191,13 @@ export default function RegisterPage() {
                     <label className="label" htmlFor="reg-confirm">Confirmer le mot de passe <span className="text-red-500">*</span></label>
                     <input {...register('confirmPassword')} id="reg-confirm" type="password" placeholder="Répétez le mot de passe" autoComplete="new-password" className={`input ${errors.confirmPassword ? 'input-error' : ''}`} />
                     {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
+                  </div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <h4 className="text-xs font-semibold text-gray-600 mb-3">Récapitulatif</h4>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-1"><span className={userPhotoPreview ? 'text-green-500' : 'text-gray-300'}>●</span>Votre photo {userPhotoPreview ? '✓' : '(non ajoutée)'}</div>
+                    <div className="flex items-center gap-1"><span className={partnerPhotoPreview ? 'text-green-500' : 'text-gray-300'}>●</span>Photo partenaire {partnerPhotoPreview ? '✓' : '(non ajoutée)'}</div>
                   </div>
                 </div>
                 <div className="bg-green-50 rounded-xl p-4 border border-green-100">
