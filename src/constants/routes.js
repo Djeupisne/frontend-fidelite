@@ -1,0 +1,1 @@
+export const ROUTES = { HOME: '/', LOGIN: '/login', REGISTER: '/register', DASHBOARD: '/dashboard', PROFILE: '/profil', EDIT_PROFILE: '/profil/modifier', PARTNER: '/partenaire', ADD_PARTNER: '/partenaire/ajouter', SEARCH: '/verification', SEARCH_RESULTS: '/verification/resultats', PLANS: '/plans', CHECKOUT: '/paiement', HISTORY: '/historique', NOT_FOUND: '*' };

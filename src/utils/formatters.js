@@ -1,0 +1,6 @@
+export const formatDate = (date) => { if (!date) return '—'; return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(date)); };
+export const formatAmount = (amount, devise = 'XOF') => { try { return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: devise, minimumFractionDigits: 0 }).format(amount); } catch { return `${amount} ${devise}`; } };
+export const formatRelative = (date) => { if (!date) return '—'; const diff = Date.now() - new Date(date).getTime(); const mins = Math.floor(diff / 60000); const hours = Math.floor(diff / 3600000); const days = Math.floor(diff / 86400000); if (mins < 1) return 'À l\'instant'; if (mins < 60) return `Il y a ${mins} min`; if (hours < 24) return `Il y a ${hours}h`; if (days < 7) return `Il y a ${days}j`; return formatDate(date); };
+export const capitalizeFirst = (str) => { if (!str) return ''; return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(); };
+export const getInitials = (nom, prenom) => { return `${(prenom || '').charAt(0)}${(nom || '').charAt(0)}`.toUpperCase(); };
+export const truncate = (str, max = 30) => { if (!str) return ''; return str.length > max ? str.substring(0, max) + '...' : str; };
