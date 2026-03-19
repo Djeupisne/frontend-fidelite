@@ -29,15 +29,15 @@ export default function LoginPage() {
           <p className="text-gray-500 mt-1 text-sm">Connectez-vous à votre compte</p>
         </div>
         <div className="card shadow-xl border border-gray-100">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" autoComplete="on">
             <div>
-              <label className="label">Adresse email</label>
-              <input {...register('email')} type="email" placeholder="votre@email.com" className={`input ${errors.email ? 'input-error' : ''}`} />
+              <label className="label" htmlFor="login-email">Adresse email</label>
+              <input {...register('email')} id="login-email" type="email" placeholder="votre@email.com" autoComplete="email" className={`input ${errors.email ? 'input-error' : ''}`} />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
             <div>
-              <label className="label">Mot de passe</label>
-              <input {...register('password')} type="password" placeholder="••••••••" className={`input ${errors.password ? 'input-error' : ''}`} />
+              <label className="label" htmlFor="login-password">Mot de passe</label>
+              <input {...register('password')} id="login-password" type="password" placeholder="••••••••" autoComplete="current-password" className={`input ${errors.password ? 'input-error' : ''}`} />
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
             <Button type="submit" loading={loading} className="w-full" size="lg">Se connecter</Button>
