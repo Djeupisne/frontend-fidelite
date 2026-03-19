@@ -9,7 +9,7 @@ import { ROUTES } from '../../constants/routes.js';
 import Button from '../../components/common/Button.jsx';
 import PhotoUpload from '../../components/photo/PhotoUpload.jsx';
 const STEPS = [{ id: 1, label: 'Votre profil' }, { id: 2, label: 'Votre partenaire' }, { id: 3, label: 'Compte' }];
-const RELIGIONS = ['Christianisme','Islam','Animisme','Autre','Non précisé'];
+const RELIGIONS = ['Christianisme','Islam','Animisme','Bouddhisme','Hindouisme','Judaïsme','Autre','Non précisé'];
 const ETUDES = ['Aucun','Primaire','Secondaire','Bac','Licence','Master','Doctorat','Autre'];
 const PAYS = ["Afghanistan","Afrique du Sud","Albanie","Algérie","Allemagne","Andorre","Angola","Antigua-et-Barbuda","Arabie Saoudite","Argentine","Arménie","Australie","Autriche","Azerbaïdjan","Bahamas","Bahreïn","Bangladesh","Barbade","Belgique","Belize","Bénin","Bhoutan","Biélorussie","Birmanie","Bolivie","Bosnie-Herzégovine","Botswana","Brésil","Brunei","Bulgarie","Burkina Faso","Burundi","Cabo Verde","Cambodge","Cameroun","Canada","Centrafrique","Chili","Chine","Chypre","Colombie","Comores","Congo","Corée du Nord","Corée du Sud","Costa Rica","Côte d'Ivoire","Croatie","Cuba","Danemark","Djibouti","Dominique","Égypte","Émirats Arabes Unis","Équateur","Érythrée","Espagne","Eswatini","Estonie","États-Unis","Éthiopie","Fidji","Finlande","France","Gabon","Gambie","Géorgie","Ghana","Grèce","Grenade","Guatemala","Guinée","Guinée-Bissau","Guinée équatoriale","Guyana","Haïti","Honduras","Hongrie","Inde","Indonésie","Irak","Iran","Irlande","Islande","Israël","Italie","Jamaïque","Japon","Jordanie","Kazakhstan","Kenya","Kirghizistan","Kiribati","Koweït","Laos","Lesotho","Lettonie","Liban","Liberia","Libye","Liechtenstein","Lituanie","Luxembourg","Madagascar","Malaisie","Malawi","Maldives","Mali","Malte","Maroc","Marshall","Maurice","Mauritanie","Mexique","Micronésie","Moldavie","Monaco","Mongolie","Monténégro","Mozambique","Namibie","Nauru","Népal","Nicaragua","Niger","Nigeria","Norvège","Nouvelle-Zélande","Oman","Ouganda","Ouzbékistan","Pakistan","Palaos","Palestine","Panama","Papouasie-Nouvelle-Guinée","Paraguay","Pays-Bas","Pérou","Philippines","Pologne","Portugal","Qatar","République Démocratique du Congo","République Dominicaine","République Tchèque","Roumanie","Royaume-Uni","Russie","Rwanda","Saint-Kitts-et-Nevis","Saint-Vincent-et-les-Grenadines","Sainte-Lucie","Salvador","Samoa","São Tomé-et-Príncipe","Sénégal","Serbie","Seychelles","Sierra Leone","Singapour","Slovaquie","Slovénie","Somalie","Soudan","Soudan du Sud","Sri Lanka","Suède","Suisse","Suriname","Syrie","Tadjikistan","Tanzanie","Tchad","Thaïlande","Timor oriental","Togo","Tonga","Trinité-et-Tobago","Tunisie","Turkménistan","Turquie","Tuvalu","Ukraine","Uruguay","Vanuatu","Vatican","Venezuela","Vietnam","Yémen","Zambie","Zimbabwe"];
 export default function RegisterPage() {
@@ -40,17 +40,21 @@ export default function RegisterPage() {
     } catch (e) { toast.error(e.message || 'Erreur lors de l\'inscription'); setStep(1); }
     finally { setLoading(false); }
   };
+  const getAutoComplete = (name) => {
+    const map = { nom:'family-name', prenom:'given-name', age:'off', pays:'country-name', ville:'address-level2', quartier:'off', religion:'off', niveauEtude:'off', profession:'organization-title', nomMere:'off', nomPere:'off', nomAine:'off', nomBenjamin:'off' };
+    return map[name] || 'off';
+  };
   const Field = ({ label, name, type = 'text', placeholder, required = false }) => (
     <div>
-      <label className="label">{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
-      <input {...register(name)} type={type} placeholder={placeholder} className={`input ${errors[name] ? 'input-error' : ''}`} />
+      <label className="label" htmlFor={name}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
+      <input {...register(name)} id={name} type={type} placeholder={placeholder} autoComplete={getAutoComplete(name)} className={`input ${errors[name] ? 'input-error' : ''}`} />
       {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}
     </div>
   );
   const SelectField = ({ label, name, options, required = false }) => (
     <div>
-      <label className="label">{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
-      <select {...register(name)} className={`input ${errors[name] ? 'input-error' : ''}`}>
+      <label className="label" htmlFor={name}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
+      <select {...register(name)} id={name} autoComplete="off" className={`input ${errors[name] ? 'input-error' : ''}`}>
         <option value="">Choisir...</option>
         {options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
@@ -78,7 +82,7 @@ export default function RegisterPage() {
             </React.Fragment>
           ))}
         </div>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           <div className="card shadow-xl border border-gray-100">
             {step === 1 && (
               <div className="space-y-5">
@@ -101,13 +105,13 @@ export default function RegisterPage() {
                 <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
                   <p className="text-xs font-semibold text-blue-800 mb-3">Informations familiales <span className="text-red-500">*</span></p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Field label="Nom de votre mère" name="nomMere" placeholder="Nom complet" required />
-                    <Field label="Nom de votre père" name="nomPere" placeholder="Nom complet" required />
-                    <Field label="Nom de l'aîné de la famille" name="nomAine" placeholder="Nom complet" required />
-                    <Field label="Nom du benjamin de la famille" name="nomBenjamin" placeholder="Nom complet" required />
+                    <Field label="Nom complet de votre mère" name="nomMere" placeholder="Prénom et nom" required />
+                    <Field label="Nom complet de votre père" name="nomPere" placeholder="Prénom et nom" required />
+                    <Field label="Nom de l'aîné de la famille" name="nomAine" placeholder="Prénom et nom" required />
+                    <Field label="Nom du benjamin de la famille" name="nomBenjamin" placeholder="Prénom et nom" required />
                   </div>
                 </div>
-                <Button type="button" onClick={nextStep} className="w-full" size="lg">Suivant — Partenaire →</Button>
+                <Button type="button" onClick={nextStep} className="w-full" size="lg">Suivant — Mon partenaire →</Button>
               </div>
             )}
             {step === 2 && (
@@ -131,16 +135,16 @@ export default function RegisterPage() {
                 <div className="bg-pink-50 rounded-xl p-4 border border-pink-100">
                   <p className="text-xs font-semibold text-pink-800 mb-3">Informations familiales du partenaire <span className="text-red-500">*</span></p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Field label="Nom de sa mère" name="partnerNomMere" placeholder="Nom complet" required />
-                    <Field label="Nom de son père" name="partnerNomPere" placeholder="Nom complet" required />
-                    <Field label="Nom de l'aîné de sa famille" name="partnerNomAine" placeholder="Nom complet" required />
-                    <Field label="Nom du benjamin de sa famille" name="partnerNomBenjamin" placeholder="Nom complet" required />
+                    <Field label="Nom complet de sa mère" name="partnerNomMere" placeholder="Prénom et nom" required />
+                    <Field label="Nom complet de son père" name="partnerNomPere" placeholder="Prénom et nom" required />
+                    <Field label="Nom de l'aîné de sa famille" name="partnerNomAine" placeholder="Prénom et nom" required />
+                    <Field label="Nom du benjamin de sa famille" name="partnerNomBenjamin" placeholder="Prénom et nom" required />
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <p className="text-xs font-semibold text-gray-600 mb-3">Informations sur votre rencontre (optionnel)</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div><label className="label">Date de la rencontre</label><input {...register('dateRencontre')} type="date" className="input" /></div>
+                    <div><label className="label" htmlFor="dateRencontre">Date de la rencontre</label><input {...register('dateRencontre')} id="dateRencontre" type="date" autoComplete="off" className="input" /></div>
                     <Field label="Lieu de la rencontre" name="lieuRencontre" placeholder="Ville, lieu..." />
                   </div>
                 </div>
@@ -157,9 +161,21 @@ export default function RegisterPage() {
                   <div><h2 className="font-semibold text-gray-900">Créer votre compte</h2><p className="text-xs text-gray-500">Email et mot de passe pour vous connecter</p></div>
                 </div>
                 <div className="space-y-4">
-                  <Field label="Adresse email" name="email" type="email" placeholder="votre@email.com" required />
-                  <Field label="Mot de passe" name="password" type="password" placeholder="Minimum 6 caractères" required />
-                  <Field label="Confirmer le mot de passe" name="confirmPassword" type="password" placeholder="Répétez le mot de passe" required />
+                  <div>
+                    <label className="label" htmlFor="reg-email">Adresse email <span className="text-red-500">*</span></label>
+                    <input {...register('email')} id="reg-email" type="email" placeholder="votre@email.com" autoComplete="email" className={`input ${errors.email ? 'input-error' : ''}`} />
+                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                  </div>
+                  <div>
+                    <label className="label" htmlFor="reg-password">Mot de passe <span className="text-red-500">*</span></label>
+                    <input {...register('password')} id="reg-password" type="password" placeholder="Minimum 6 caractères" autoComplete="new-password" className={`input ${errors.password ? 'input-error' : ''}`} />
+                    {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+                  </div>
+                  <div>
+                    <label className="label" htmlFor="reg-confirm">Confirmer le mot de passe <span className="text-red-500">*</span></label>
+                    <input {...register('confirmPassword')} id="reg-confirm" type="password" placeholder="Répétez le mot de passe" autoComplete="new-password" className={`input ${errors.confirmPassword ? 'input-error' : ''}`} />
+                    {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
+                  </div>
                 </div>
                 <div className="bg-green-50 rounded-xl p-4 border border-green-100">
                   <p className="text-xs text-green-700">🔒 Vos données sont chiffrées et strictement confidentielles. Elles ne seront jamais vendues à des tiers.</p>
