@@ -50,7 +50,7 @@ export default function CheckoutPage() {
             <p className="text-2xl font-bold text-primary-600 mb-1">{formatAmount(plan.prix, plan.devise)}</p>
             <p className="text-sm text-primary-700">{plan.nom}</p>
           </div>
-          <p className="text-xs text-gray-400 mt-4">Simulation — En production, CinetPay enverra une notification sur votre téléphone</p>
+          <p className="text-xs text-gray-400 mt-4">Simulation , CinetPay enverra une notification sur votre téléphone</p>
         </div>
       </main><Footer />
     </div>
