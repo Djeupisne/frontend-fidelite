@@ -21,7 +21,7 @@ export default function EditProfilePage() {
   const [newPhoto, setNewPhoto] = useState(null);
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(profileSchema),
-    defaultValues: { nom: user?.nom || '', prenom: user?.prenom || '', age: user?.age || '', pays: user?.pays || '', ville: user?.ville || '', quartier: user?.quartier || '', religion: user?.religion || '', niveauEtude: user?.niveauEtude || '', profession: user?.profession || '', nomMere: user?.nomMere || '', nomPere: user?.nomPere || '', nomAine: user?.nomAine || '', nomBenjamin: user?.nomBenjamin || '' }
+    defaultValues: { nom: user?.nom||'', prenom: user?.prenom||'', telephone: user?.telephone||'', age: user?.age||'', pays: user?.pays||'', ville: user?.ville||'', quartier: user?.quartier||'', religion: user?.religion||'', niveauEtude: user?.niveauEtude||'', profession: user?.profession||'', nomMere: user?.nomMere||'', nomPere: user?.nomPere||'', nomAine: user?.nomAine||'', nomBenjamin: user?.nomBenjamin||'' }
   });
   const onSubmit = async (data) => {
     setLoading(true);
@@ -36,7 +36,7 @@ export default function EditProfilePage() {
   };
   const F = ({ label, name, type = 'text', placeholder }) => (
     <div><label className="label" htmlFor={`ep-${name}`}>{label}</label>
-    <input {...register(name)} id={`ep-${name}`} type={type} placeholder={placeholder} autoComplete="off" className={`input ${errors[name] ? 'input-error' : ''}`} />
+    <input {...register(name)} id={`ep-${name}`} type={type} placeholder={placeholder} autoComplete={name === 'telephone' ? 'tel' : 'off'} className={`input ${errors[name] ? 'input-error' : ''}`} />
     {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}</div>
   );
   const S = ({ label, name, options }) => (
@@ -51,17 +51,20 @@ export default function EditProfilePage() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" autoComplete="off">
           <div className="card">
             <h3 className="font-semibold text-gray-900 mb-4">Photo de profil</h3>
-            <div className="flex justify-center">
-              <PhotoUpload label="Ma photo" onChange={setNewPhoto} initialPreview={user?.photo || null} />
-            </div>
+            <div className="flex justify-center"><PhotoUpload label="Ma photo" onChange={setNewPhoto} initialPreview={user?.photo || null} /></div>
           </div>
           <div className="card">
             <h3 className="font-semibold text-gray-900 mb-4">Informations personnelles</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <F label="Nom" name="nom" placeholder="Votre nom" /><F label="Prénom" name="prenom" placeholder="Votre prénom" />
-              <F label="Age" name="age" type="number" placeholder="Votre âge" /><S label="Pays" name="pays" options={PAYS} />
-              <F label="Ville" name="ville" placeholder="Votre ville" /><F label="Quartier" name="quartier" placeholder="Votre quartier" />
-              <S label="Religion" name="religion" options={RELIGIONS} /><S label="Niveau d'étude" name="niveauEtude" options={ETUDES} />
+              <F label="Nom" name="nom" placeholder="Votre nom" />
+              <F label="Prénom" name="prenom" placeholder="Votre prénom" />
+              <F label="Numéro de téléphone" name="telephone" type="tel" placeholder="Ex: +228 90 00 00 00" />
+              <F label="Age" name="age" type="number" placeholder="Votre âge" />
+              <S label="Pays" name="pays" options={PAYS} />
+              <F label="Ville" name="ville" placeholder="Votre ville" />
+              <F label="Quartier" name="quartier" placeholder="Votre quartier" />
+              <S label="Religion" name="religion" options={RELIGIONS} />
+              <S label="Niveau d'étude" name="niveauEtude" options={ETUDES} />
               <F label="Profession" name="profession" placeholder="Votre métier" />
             </div>
           </div>
