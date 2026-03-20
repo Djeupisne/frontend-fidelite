@@ -23,28 +23,16 @@ export default function RegisterPage() {
   const [partnerPhoto, setPartnerPhoto] = useState(null);
   const [partnerPhotoPreview, setPartnerPhotoPreview] = useState(null);
   const { register, handleSubmit, trigger, formState: { errors } } = useForm({ resolver: zodResolver(registerSchema), mode: 'onChange' });
-  const userFields = ['nom','prenom','age','pays','ville','quartier','nomMere','nomPere','nomAine','nomBenjamin'];
+  const userFields = ['nom','prenom','telephone','age','pays','ville','quartier','nomMere','nomPere','nomAine','nomBenjamin'];
   const partnerFields = ['partnerNom','partnerPrenom','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin'];
-  const nextStep = async () => {
-    const fields = step === 1 ? userFields : partnerFields;
-    const valid = await trigger(fields);
-    if (valid) { setApiError(''); setStep(s => s + 1); }
-  };
-  const handleUserPhotoChange = (file) => {
-    setUserPhoto(file);
-    if (file) { const reader = new FileReader(); reader.onloadend = () => setUserPhotoPreview(reader.result); reader.readAsDataURL(file); }
-    else setUserPhotoPreview(null);
-  };
-  const handlePartnerPhotoChange = (file) => {
-    setPartnerPhoto(file);
-    if (file) { const reader = new FileReader(); reader.onloadend = () => setPartnerPhotoPreview(reader.result); reader.readAsDataURL(file); }
-    else setPartnerPhotoPreview(null);
-  };
+  const nextStep = async () => { const fields = step === 1 ? userFields : partnerFields; const valid = await trigger(fields); if (valid) { setApiError(''); setStep(s => s + 1); } };
+  const handleUserPhotoChange = (file) => { setUserPhoto(file); if (file) { const r = new FileReader(); r.onloadend = () => setUserPhotoPreview(r.result); r.readAsDataURL(file); } else setUserPhotoPreview(null); };
+  const handlePartnerPhotoChange = (file) => { setPartnerPhoto(file); if (file) { const r = new FileReader(); r.onloadend = () => setPartnerPhotoPreview(r.result); r.readAsDataURL(file); } else setPartnerPhotoPreview(null); };
   const onSubmit = async (data) => {
     setLoading(true); setApiError('');
     try {
       const formData = new FormData();
-      const allFields = ['email','password','nom','prenom','age','pays','ville','quartier','religion','niveauEtude','profession','nomMere','nomPere','nomAine','nomBenjamin','partnerNom','partnerPrenom','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerReligion','partnerNiveauEtude','partnerProfession','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin','dateRencontre','lieuRencontre'];
+      const allFields = ['email','password','telephone','nom','prenom','age','pays','ville','quartier','religion','niveauEtude','profession','nomMere','nomPere','nomAine','nomBenjamin','partnerNom','partnerPrenom','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerReligion','partnerNiveauEtude','partnerProfession','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin','dateRencontre','lieuRencontre'];
       allFields.forEach(key => { if (data[key] !== undefined && data[key] !== null && data[key] !== '') formData.append(key, String(data[key])); });
       if (userPhoto) formData.append('photo', userPhoto);
       if (partnerPhoto) formData.append('partnerPhoto', partnerPhoto);
@@ -54,23 +42,16 @@ export default function RegisterPage() {
     } catch (e) { const msg = e.message || 'Une erreur est survenue'; setApiError(msg); toast.error(msg); if (msg.toLowerCase().includes('email')) setStep(3); }
     finally { setLoading(false); }
   };
-  const getAC = (n) => ({ nom:'family-name', prenom:'given-name', pays:'country-name', ville:'address-level2', profession:'organization-title' }[n] || 'off');
+  const getAC = (n) => ({ nom:'family-name', prenom:'given-name', telephone:'tel', pays:'country-name', ville:'address-level2', profession:'organization-title' }[n] || 'off');
   const F = ({ label, name, type = 'text', placeholder, required = false }) => (
-    <div>
-      <label className="label" htmlFor={`r-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
-      <input {...register(name)} id={`r-${name}`} type={type} placeholder={placeholder} autoComplete={getAC(name)} className={`input ${errors[name] ? 'input-error' : ''}`} />
-      {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}
-    </div>
+    <div><label className="label" htmlFor={`r-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
+    <input {...register(name)} id={`r-${name}`} type={type} placeholder={placeholder} autoComplete={getAC(name)} className={`input ${errors[name] ? 'input-error' : ''}`} />
+    {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}</div>
   );
   const S = ({ label, name, options, required = false }) => (
-    <div>
-      <label className="label" htmlFor={`r-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
-      <select {...register(name)} id={`r-${name}`} autoComplete="off" className={`input ${errors[name] ? 'input-error' : ''}`}>
-        <option value="">Choisir...</option>
-        {options.map(o => <option key={o} value={o}>{o}</option>)}
-      </select>
-      {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}
-    </div>
+    <div><label className="label" htmlFor={`r-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
+    <select {...register(name)} id={`r-${name}`} autoComplete="off" className={`input ${errors[name] ? 'input-error' : ''}`}><option value="">Choisir...</option>{options.map(o => <option key={o} value={o}>{o}</option>)}</select>
+    {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>}</div>
   );
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-8 px-4">
@@ -97,21 +78,26 @@ export default function RegisterPage() {
             <div style={{ display: step === 1 ? 'block' : 'none' }}>
               <div className="space-y-5">
                 <div className="flex items-center gap-3 pb-4 border-b border-gray-100"><div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-xl">👤</div><div><h2 className="font-semibold text-gray-900">Vos informations personnelles</h2><p className="text-xs text-gray-500">Informations vous concernant directement</p></div></div>
-                <div className="flex justify-center">
-                  <PhotoUpload label="Votre photo (optionnel)" onChange={handleUserPhotoChange} initialPreview={userPhotoPreview} />
-                </div>
+                <div className="flex justify-center"><PhotoUpload label="Votre photo (optionnel)" onChange={handleUserPhotoChange} initialPreview={userPhotoPreview} /></div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <F label="Nom" name="nom" placeholder="Votre nom de famille" required /><F label="Prénom" name="prenom" placeholder="Votre prénom" required />
-                  <F label="Age" name="age" type="number" placeholder="Ex: 28" required /><S label="Pays" name="pays" options={PAYS} required />
-                  <F label="Ville" name="ville" placeholder="Votre ville" required /><F label="Quartier" name="quartier" placeholder="Votre quartier" required />
-                  <S label="Religion" name="religion" options={RELIGIONS} /><S label="Niveau d'étude" name="niveauEtude" options={ETUDES} />
+                  <F label="Nom" name="nom" placeholder="Votre nom de famille" required />
+                  <F label="Prénom" name="prenom" placeholder="Votre prénom" required />
+                  <F label="Numéro de téléphone" name="telephone" type="tel" placeholder="Ex: +228 90 00 00 00" required />
+                  <F label="Age" name="age" type="number" placeholder="Ex: 28" required />
+                  <S label="Pays" name="pays" options={PAYS} required />
+                  <F label="Ville" name="ville" placeholder="Votre ville" required />
+                  <F label="Quartier" name="quartier" placeholder="Votre quartier" required />
+                  <S label="Religion" name="religion" options={RELIGIONS} />
+                  <S label="Niveau d'étude" name="niveauEtude" options={ETUDES} />
                   <F label="Profession" name="profession" placeholder="Votre métier" />
                 </div>
                 <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
                   <p className="text-xs font-semibold text-blue-800 mb-3">Informations familiales <span className="text-red-500">*</span></p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <F label="Nom complet de votre mère" name="nomMere" placeholder="Prénom et nom" required /><F label="Nom complet de votre père" name="nomPere" placeholder="Prénom et nom" required />
-                    <F label="Nom de l'aîné de la famille" name="nomAine" placeholder="Prénom et nom" required /><F label="Nom du benjamin de la famille" name="nomBenjamin" placeholder="Prénom et nom" required />
+                    <F label="Nom complet de votre mère" name="nomMere" placeholder="Prénom et nom" required />
+                    <F label="Nom complet de votre père" name="nomPere" placeholder="Prénom et nom" required />
+                    <F label="Nom de l'aîné de la famille" name="nomAine" placeholder="Prénom et nom" required />
+                    <F label="Nom du benjamin de la famille" name="nomBenjamin" placeholder="Prénom et nom" required />
                   </div>
                 </div>
                 <Button type="button" onClick={nextStep} className="w-full" size="lg">Suivant — Informations partenaire →</Button>
@@ -120,21 +106,25 @@ export default function RegisterPage() {
             <div style={{ display: step === 2 ? 'block' : 'none' }}>
               <div className="space-y-5">
                 <div className="flex items-center gap-3 pb-4 border-b border-gray-100"><div className="w-10 h-10 bg-secondary-100 rounded-xl flex items-center justify-center text-xl">💑</div><div><h2 className="font-semibold text-gray-900">Informations du partenaire</h2><p className="text-xs text-gray-500">Informations concernant votre partenaire</p></div></div>
-                <div className="flex justify-center">
-                  <PhotoUpload label="Photo du partenaire (optionnel)" onChange={handlePartnerPhotoChange} initialPreview={partnerPhotoPreview} />
-                </div>
+                <div className="flex justify-center"><PhotoUpload label="Photo du partenaire (optionnel)" onChange={handlePartnerPhotoChange} initialPreview={partnerPhotoPreview} /></div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <F label="Nom du partenaire" name="partnerNom" placeholder="Son nom de famille" required /><F label="Prénom du partenaire" name="partnerPrenom" placeholder="Son prénom" required />
-                  <F label="Age du partenaire" name="partnerAge" type="number" placeholder="Ex: 30" required /><S label="Pays du partenaire" name="partnerPays" options={PAYS} required />
-                  <F label="Ville du partenaire" name="partnerVille" placeholder="Sa ville" required /><F label="Quartier du partenaire" name="partnerQuartier" placeholder="Son quartier" required />
-                  <S label="Religion" name="partnerReligion" options={RELIGIONS} /><S label="Niveau d'étude" name="partnerNiveauEtude" options={ETUDES} />
+                  <F label="Nom du partenaire" name="partnerNom" placeholder="Son nom de famille" required />
+                  <F label="Prénom du partenaire" name="partnerPrenom" placeholder="Son prénom" required />
+                  <F label="Age du partenaire" name="partnerAge" type="number" placeholder="Ex: 30" required />
+                  <S label="Pays du partenaire" name="partnerPays" options={PAYS} required />
+                  <F label="Ville du partenaire" name="partnerVille" placeholder="Sa ville" required />
+                  <F label="Quartier du partenaire" name="partnerQuartier" placeholder="Son quartier" required />
+                  <S label="Religion" name="partnerReligion" options={RELIGIONS} />
+                  <S label="Niveau d'étude" name="partnerNiveauEtude" options={ETUDES} />
                   <F label="Profession" name="partnerProfession" placeholder="Son métier" />
                 </div>
                 <div className="bg-pink-50 rounded-xl p-4 border border-pink-100">
                   <p className="text-xs font-semibold text-pink-800 mb-3">Informations familiales du partenaire <span className="text-red-500">*</span></p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <F label="Nom complet de sa mère" name="partnerNomMere" placeholder="Prénom et nom" required /><F label="Nom complet de son père" name="partnerNomPere" placeholder="Prénom et nom" required />
-                    <F label="Nom de l'aîné de sa famille" name="partnerNomAine" placeholder="Prénom et nom" required /><F label="Nom du benjamin de sa famille" name="partnerNomBenjamin" placeholder="Prénom et nom" required />
+                    <F label="Nom complet de sa mère" name="partnerNomMere" placeholder="Prénom et nom" required />
+                    <F label="Nom complet de son père" name="partnerNomPere" placeholder="Prénom et nom" required />
+                    <F label="Nom de l'aîné de sa famille" name="partnerNomAine" placeholder="Prénom et nom" required />
+                    <F label="Nom du benjamin de sa famille" name="partnerNomBenjamin" placeholder="Prénom et nom" required />
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
@@ -161,15 +151,9 @@ export default function RegisterPage() {
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                   <h4 className="text-xs font-semibold text-gray-600 mb-3">Récapitulatif photos</h4>
                   <div className="flex items-center gap-6">
-                    <div className="flex flex-col items-center gap-2">
-                      {userPhotoPreview ? <img src={userPhotoPreview} alt="Votre photo" className="w-14 h-14 rounded-xl object-cover border-2 border-primary-200" /> : <div className="w-14 h-14 rounded-xl bg-gray-200 flex items-center justify-center text-gray-400 text-xs">Pas de photo</div>}
-                      <span className="text-xs text-gray-500">Vous</span>
-                    </div>
+                    <div className="flex flex-col items-center gap-2">{userPhotoPreview ? <img src={userPhotoPreview} alt="Votre photo" className="w-14 h-14 rounded-xl object-cover border-2 border-primary-200" /> : <div className="w-14 h-14 rounded-xl bg-gray-200 flex items-center justify-center text-gray-400 text-xs text-center">Pas de photo</div>}<span className="text-xs text-gray-500">Vous</span></div>
                     <div className="text-gray-300 text-2xl">💑</div>
-                    <div className="flex flex-col items-center gap-2">
-                      {partnerPhotoPreview ? <img src={partnerPhotoPreview} alt="Photo partenaire" className="w-14 h-14 rounded-xl object-cover border-2 border-secondary-200" /> : <div className="w-14 h-14 rounded-xl bg-gray-200 flex items-center justify-center text-gray-400 text-xs">Pas de photo</div>}
-                      <span className="text-xs text-gray-500">Partenaire</span>
-                    </div>
+                    <div className="flex flex-col items-center gap-2">{partnerPhotoPreview ? <img src={partnerPhotoPreview} alt="Photo partenaire" className="w-14 h-14 rounded-xl object-cover border-2 border-secondary-200" /> : <div className="w-14 h-14 rounded-xl bg-gray-200 flex items-center justify-center text-gray-400 text-xs text-center">Pas de photo</div>}<span className="text-xs text-gray-500">Partenaire</span></div>
                   </div>
                 </div>
                 <div className="bg-green-50 rounded-xl p-4 border border-green-100"><p className="text-xs text-green-700">🔒 Vos données sont chiffrées et strictement confidentielles.</p></div>
