@@ -9,6 +9,11 @@ import OptionSelector from '../../components/search/OptionSelector.jsx';
 import { searchApi } from '../../services/search.api.js';
 import { SEARCH_TYPES } from '../../constants/plans.js';
 import toast from 'react-hot-toast';
+const getCreditCost = (type, niveau) => {
+  if (type === SEARCH_TYPES.PHOTO) return 5;
+  if (type === SEARCH_TYPES.TOUS) return 13;
+  return niveau || 1;
+};
 export default function SearchPage() {
   const { user, partner, loadUser } = useAuth();
   const navigate = useNavigate();
@@ -16,11 +21,12 @@ export default function SearchPage() {
   const [niveau, setNiveau] = useState(2);
   const [loading, setLoading] = useState(false);
   const credits = user?.searchCredits || 0;
+  const creditCost = getCreditCost(type, niveau);
   const partnerHasPhoto = partner?.photo && partner.photo !== '';
-  const canUsePhotoSearch = type !== SEARCH_TYPES.PHOTO || partnerHasPhoto;
+  const canSearch = partner && (type !== SEARCH_TYPES.PHOTO || partnerHasPhoto) && credits >= creditCost;
   const handleSearch = async () => {
     if (!partner) { toast.error('Vous devez d\'abord ajouter votre partenaire'); return; }
-    if (credits <= 0) { toast.error('Vous n\'avez pas de crédits. Achetez un plan.'); navigate(ROUTES.PLANS); return; }
+    if (credits < creditCost) { toast.error(`Crédits insuffisants. Cette vérification coûte ${creditCost} crédit(s).`); navigate(ROUTES.PLANS); return; }
     if (type === SEARCH_TYPES.PHOTO && !partnerHasPhoto) { toast.error('Votre partenaire n\'a pas de photo. Ajoutez-en une d\'abord.'); return; }
     setLoading(true);
     try {
@@ -54,8 +60,11 @@ export default function SearchPage() {
                 <h2 className="font-semibold text-gray-900">Crédits disponibles</h2>
                 <span className="text-2xl font-bold text-primary-600">{credits}</span>
               </div>
-              <div className="h-2 bg-gray-100 rounded-full"><div className="h-full bg-primary-500 rounded-full transition-all" style={{ width: `${Math.min((credits / 10) * 100, 100)}%` }} /></div>
-              <p className="text-xs text-gray-400 mt-2">1 crédit sera débité par vérification</p>
+              <div className="h-2 bg-gray-100 rounded-full"><div className="h-full bg-primary-500 rounded-full transition-all" style={{ width: `${Math.min((credits / 50) * 100, 100)}%` }} /></div>
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-gray-400">Coût de cette vérification</p>
+                <span className={`text-sm font-bold ${credits >= creditCost ? 'text-primary-600' : 'text-red-500'}`}>{creditCost} crédit{creditCost > 1 ? 's' : ''}</span>
+              </div>
             </div>
             {!partner ? (
               <div className="card text-center py-8">
@@ -67,7 +76,7 @@ export default function SearchPage() {
               <div className="card">
                 <h3 className="font-medium text-gray-700 mb-3 text-sm">Partenaire à vérifier</h3>
                 <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
-                  {partner.photo && partner.photo !== '' ? (
+                  {partnerHasPhoto ? (
                     <img src={partner.photo} alt="" className="w-10 h-10 rounded-lg object-cover" onError={e => e.target.style.display='none'} />
                   ) : (
                     <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold">{(partner.prenom||'?').charAt(0)}</div>
@@ -76,27 +85,33 @@ export default function SearchPage() {
                     <p className="font-medium text-gray-900 text-sm">{partner.prenom} {partner.nom}</p>
                     <p className="text-xs text-gray-500">{partner.ville}, {partner.pays}</p>
                   </div>
-                  {!partnerHasPhoto && (
-                    <Link to={ROUTES.PARTNER} className="text-xs text-primary-600 hover:underline flex-shrink-0">+ Ajouter photo</Link>
-                  )}
+                  {!partnerHasPhoto && <Link to={ROUTES.PARTNER} className="text-xs text-primary-600 hover:underline flex-shrink-0">+ Ajouter photo</Link>}
                 </div>
               </div>
             )}
             <div className="card">
-              <h3 className="font-semibold text-gray-900 mb-5">Options de vérification</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Options de vérification</h3>
+              <div className="flex flex-wrap gap-2 mb-5">
+                <span className="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-100">📸 Par photo = <strong>5 crédits</strong></span>
+                <span className="text-xs bg-purple-50 text-purple-700 px-3 py-1 rounded-full border border-purple-100">📋 Par info = <strong>1 crédit / info</strong></span>
+                <span className="text-xs bg-pink-50 text-pink-700 px-3 py-1 rounded-full border border-pink-100">🔍 Tout vérifier = <strong>13 crédits</strong></span>
+              </div>
               <OptionSelector type={type} niveau={niveau} onTypeChange={setType} onNiveauChange={setNiveau} />
               {type === SEARCH_TYPES.PHOTO && !partnerHasPhoto && (
                 <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-3">
                   <span className="text-amber-500 text-lg flex-shrink-0">⚠️</span>
-                  <div>
-                    <p className="text-sm font-medium text-amber-800">Photo requise</p>
-                    <p className="text-xs text-amber-600 mt-0.5">Votre partenaire n'a pas de photo. <Link to={ROUTES.PARTNER} className="underline font-medium">Ajoutez-en une</Link> pour utiliser cette option.</p>
-                  </div>
+                  <div><p className="text-sm font-medium text-amber-800">Photo requise</p><p className="text-xs text-amber-600 mt-0.5">Votre partenaire n'a pas de photo. <Link to={ROUTES.PARTNER} className="underline font-medium">Ajoutez-en une</Link>.</p></div>
+                </div>
+              )}
+              {credits < creditCost && credits > 0 && (
+                <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-3">
+                  <span className="text-red-500 text-lg flex-shrink-0">❌</span>
+                  <div><p className="text-sm font-medium text-red-800">Crédits insuffisants</p><p className="text-xs text-red-600 mt-0.5">Il vous faut <strong>{creditCost}</strong> crédits. Vous avez <strong>{credits}</strong>. <Link to={ROUTES.PLANS} className="underline font-medium">Acheter des crédits</Link>.</p></div>
                 </div>
               )}
             </div>
-            <Button onClick={handleSearch} loading={loading} disabled={!partner || !canUsePhotoSearch} className="w-full" size="lg">
-              🔍 Lancer la vérification — 1 crédit
+            <Button onClick={handleSearch} loading={loading} disabled={!canSearch} className="w-full" size="lg">
+              🔍 Lancer la vérification — {creditCost} crédit{creditCost > 1 ? 's' : ''}
             </Button>
           </div>
         )}
