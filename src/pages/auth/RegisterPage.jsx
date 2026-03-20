@@ -32,7 +32,7 @@ export default function RegisterPage() {
     setLoading(true); setApiError('');
     try {
       const formData = new FormData();
-      const allFields = ['email','password','telephone','nom','prenom','age','pays','ville','quartier','religion','niveauEtude','profession','nomMere','nomPere','nomAine','nomBenjamin','partnerNom','partnerPrenom','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerReligion','partnerNiveauEtude','partnerProfession','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin','dateRencontre','lieuRencontre'];
+      const allFields = ['email','password','telephone','nom','prenom','age','pays','ville','quartier','religion','niveauEtude','profession','nomMere','nomPere','nomAine','nomBenjamin','partnerNom','partnerPrenom','partnerTelephone','partnerAge','partnerPays','partnerVille','partnerQuartier','partnerReligion','partnerNiveauEtude','partnerProfession','partnerNomMere','partnerNomPere','partnerNomAine','partnerNomBenjamin','dateRencontre','lieuRencontre'];
       allFields.forEach(key => { if (data[key] !== undefined && data[key] !== null && data[key] !== '') formData.append(key, String(data[key])); });
       if (userPhoto) formData.append('photo', userPhoto);
       if (partnerPhoto) formData.append('partnerPhoto', partnerPhoto);
@@ -42,7 +42,7 @@ export default function RegisterPage() {
     } catch (e) { const msg = e.message || 'Une erreur est survenue'; setApiError(msg); toast.error(msg); if (msg.toLowerCase().includes('email')) setStep(3); }
     finally { setLoading(false); }
   };
-  const getAC = (n) => ({ nom:'family-name', prenom:'given-name', telephone:'tel', pays:'country-name', ville:'address-level2', profession:'organization-title' }[n] || 'off');
+  const getAC = (n) => ({ nom:'family-name', prenom:'given-name', telephone:'tel', partnerTelephone:'tel', pays:'country-name', ville:'address-level2', profession:'organization-title' }[n] || 'off');
   const F = ({ label, name, type = 'text', placeholder, required = false }) => (
     <div><label className="label" htmlFor={`r-${name}`}>{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
     <input {...register(name)} id={`r-${name}`} type={type} placeholder={placeholder} autoComplete={getAC(name)} className={`input ${errors[name] ? 'input-error' : ''}`} />
@@ -110,6 +110,7 @@ export default function RegisterPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <F label="Nom du partenaire" name="partnerNom" placeholder="Son nom de famille" required />
                   <F label="Prénom du partenaire" name="partnerPrenom" placeholder="Son prénom" required />
+                  <F label="Numéro de téléphone du partenaire" name="partnerTelephone" type="tel" placeholder="Ex: +228 90 00 00 00" />
                   <F label="Age du partenaire" name="partnerAge" type="number" placeholder="Ex: 30" required />
                   <S label="Pays du partenaire" name="partnerPays" options={PAYS} required />
                   <F label="Ville du partenaire" name="partnerVille" placeholder="Sa ville" required />
