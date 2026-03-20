@@ -9,14 +9,14 @@ import Modal from '../../components/common/Modal.jsx';
 import { userApi } from '../../services/user.api.js';
 import { formatDate, getInitials } from '../../utils/formatters.js';
 import toast from 'react-hot-toast';
-const FIELD_LABELS = { nom:'Nom', prenom:'Prénom', age:'Age', pays:'Pays', ville:'Ville', quartier:'Quartier', religion:'Religion', niveauEtude:"Niveau d'étude", profession:'Profession', nomMere:'Nom de la mère', nomPere:'Nom du père', nomAine:"Nom de l'aîné", nomBenjamin:'Nom du benjamin' };
+const FIELD_LABELS = { nom:'Nom', prenom:'Prénom', telephone:'Téléphone', age:'Age', pays:'Pays', ville:'Ville', quartier:'Quartier', religion:'Religion', niveauEtude:"Niveau d'étude", profession:'Profession', nomMere:'Nom de la mère', nomPere:'Nom du père', nomAine:"Nom de l'aîné", nomBenjamin:'Nom du benjamin' };
 const SafeAvatar = ({ photo, nom, prenom }) => {
   const [err, setErr] = useState(false);
   if (photo && photo !== '' && !err) return <img src={photo} alt="" className="w-20 h-20 rounded-2xl object-cover shadow-md" onError={() => setErr(true)} />;
   return <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center text-primary-700 font-bold text-2xl shadow-md">{getInitials(nom, prenom)}</div>;
 };
 export default function ProfilePage() {
-  const { user, loadUser } = useAuth();
+  const { user } = useAuth();
   const [pwdModal, setPwdModal] = useState(false);
   const [loadingPwd, setLoadingPwd] = useState(false);
   const [pwdData, setPwdData] = useState({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
@@ -42,6 +42,7 @@ export default function ProfilePage() {
             <div>
               <h2 className="text-xl font-bold text-gray-900">{user?.prenom} {user?.nom}</h2>
               <p className="text-gray-500 text-sm">{user?.email}</p>
+              {user?.telephone && <p className="text-gray-500 text-sm">📞 {user.telephone}</p>}
               <p className="text-gray-400 text-xs mt-1">Membre depuis {formatDate(user?.createdAt)}</p>
             </div>
           </div>
