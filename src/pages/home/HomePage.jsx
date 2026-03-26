@@ -8,7 +8,7 @@ const GlobalStyles = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-    .mf-page { font-family: 'DM Sans', sans-serif; background: #06060e; color: #e8e4dc; }
+    .mf-page { font-family: 'DM Sans', sans-serif; background: #ffe4e1; color: #e8e4dc; }
     .mf-serif { font-family: 'Cormorant Garamond', serif; }
 
     @keyframes mf-fade-up {
