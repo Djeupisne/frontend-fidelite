@@ -445,8 +445,7 @@ export default function HomePage() {
 
               <div className="mf-hero-line" style={{ height: 1, background: 'linear-gradient(90deg, #C9A84C, transparent)', marginBottom: '1.75rem', maxWidth: 400 }} />
 
-              {/* Hero description - increased contrast for better readability */}
-              <p className="mf-a3" style={{ fontSize: '1.05rem', fontWeight: 400, lineHeight: 1.8, color: 'rgba(232,228,220,0.85)', maxWidth: 520, marginBottom: '2.5rem' }}>
+              <p className="mf-a3" style={{ fontSize: '1.05rem', fontWeight: 300, lineHeight: 1.8, color: 'rgba(232,228,220,0.65)', maxWidth: 520, marginBottom: '2.5rem' }}>
                 Vérifiez discrètement si votre partenaire est enregistré dans notre base de données par d'autres personnes. Choisissez votre niveau de précision, obtenez la vérité.
               </p>
 
@@ -459,14 +458,14 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Trust row - increased contrast */}
+              {/* Trust row */}
               <div className="mf-a5" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
                 {[
                   ['🔒', 'Confidentiel'],
                   ['⚡', 'Instantané'],
                   ['🛡️', 'Sécurisé'],
                 ].map(([icon, label]) => (
-                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'rgba(232,228,220,0.7)', fontWeight: 500, letterSpacing: '.04em', textTransform: 'uppercase' }}>
+                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'rgba(232,228,220,0.45)', fontWeight: 500, letterSpacing: '.04em', textTransform: 'uppercase' }}>
                     <span style={{ fontSize: '1rem' }}>{icon}</span>
                     {label}
                   </div>
@@ -490,7 +489,7 @@ export default function HomePage() {
                   animationDelay: s.delay,
                 }}>
                   <div className="mf-serif" style={{ fontSize: '2.2rem', fontWeight: 600, color: '#C9A84C', lineHeight: 1 }}>{s.val}</div>
-                  <div style={{ fontSize: '0.72rem', color: 'rgba(232,228,220,0.7)', marginTop: '0.4rem', letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 500 }}>{s.lab}</div>
+                  <div style={{ fontSize: '0.72rem', color: 'rgba(232,228,220,0.45)', marginTop: '0.4rem', letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 500 }}>{s.lab}</div>
                 </div>
               ))}
             </div>
@@ -534,8 +533,7 @@ export default function HomePage() {
                   background: 'rgba(201,168,76,0.05)',
                 }}>{step.tag}</div>
                 <h3 className="mf-serif" style={{ fontSize: '1.55rem', fontWeight: 400, color: '#e8e4dc', lineHeight: 1.2, marginBottom: '1rem', whiteSpace: 'pre-line' }}>{step.title}</h3>
-                {/* Step body - increased contrast */}
-                <p style={{ fontSize: '0.9rem', color: 'rgba(232,228,220,0.8)', lineHeight: 1.75, fontWeight: 400 }}>{step.body}</p>
+                <p style={{ fontSize: '0.88rem', color: 'rgba(232,228,220,0.55)', lineHeight: 1.75, fontWeight: 300 }}>{step.body}</p>
                 {i < steps.length - 1 && (
                   <div style={{ position: 'absolute', bottom: -1, right: -1, width: 40, height: 40, borderLeft: '1px solid rgba(201,168,76,0.15)', borderTop: '1px solid rgba(201,168,76,0.15)', borderRadius: '0 0 0 8px' }} />
                 )}
@@ -557,12 +555,11 @@ export default function HomePage() {
             <h2 className="mf-serif" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 300, color: '#e8e4dc', lineHeight: 1.1, marginBottom: '1.5rem' }}>
               Une fiche<br /><em style={{ color: '#C9A84C', fontStyle: 'italic' }}>détaillée</em><br />pour chaque personne
             </h2>
-            {/* Left description - increased contrast */}
-            <p style={{ fontSize: '0.95rem', color: 'rgba(232,228,220,0.8)', lineHeight: 1.8, marginBottom: '2rem', fontWeight: 400 }}>
+            <p style={{ fontSize: '0.9rem', color: 'rgba(232,228,220,0.55)', lineHeight: 1.8, marginBottom: '2rem', fontWeight: 300 }}>
               Plus les informations renseignées sont précises, plus la vérification est fiable et les résultats parlants.
             </p>
             <div style={{ padding: '1.25rem 1.5rem', borderRadius: 14, border: '1px solid rgba(201,168,76,0.2)', background: 'rgba(201,168,76,0.04)', marginBottom: '2rem' }}>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(201,168,76,0.9)', fontWeight: 500, lineHeight: 1.6 }}>
+              <p style={{ fontSize: '0.8rem', color: 'rgba(201,168,76,0.8)', fontWeight: 500, lineHeight: 1.6 }}>
                 ⚡ Chaque champ renseigné augmente la précision de votre vérification
               </p>
             </div>
@@ -571,9 +568,9 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Right: fields list - increased contrast for text */}
+          {/* Right: fields list */}
           <div style={{ borderRadius: 20, border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)', padding: '1.75rem 2rem' }}>
-            <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(232,228,220,0.5)', marginBottom: '1rem' }}>
+            <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(232,228,220,0.3)', marginBottom: '1rem' }}>
               Champs de vérification — {infoFields.length} critères
             </p>
             {infoFields.map((field, i) => (
@@ -581,8 +578,7 @@ export default function HomePage() {
                 <div className="mf-info-icon">{field.icon}</div>
                 <div>
                   <div style={{ fontSize: '0.9rem', fontWeight: 500, color: '#e8e4dc' }}>{field.text}</div>
-                  {/* Subtext increased contrast */}
-                  <div style={{ fontSize: '0.75rem', color: 'rgba(232,228,220,0.6)', marginTop: 2 }}>{field.sub}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'rgba(232,228,220,0.4)', marginTop: 2 }}>{field.sub}</div>
                 </div>
               </div>
             ))}
@@ -600,8 +596,7 @@ export default function HomePage() {
             <h2 className="mf-serif" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 300, color: '#e8e4dc', lineHeight: 1.1, marginBottom: '1rem' }}>
               Votre niveau de <em style={{ color: '#C9A84C', fontStyle: 'italic' }}>vérification</em>
             </h2>
-            {/* Description increased contrast */}
-            <p style={{ fontSize: '0.95rem', color: 'rgba(232,228,220,0.75)', maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
+            <p style={{ fontSize: '0.9rem', color: 'rgba(232,228,220,0.45)', maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
               Du contrôle visuel à la vérification exhaustive — choisissez selon vos besoins.
             </p>
           </div>
@@ -622,15 +617,14 @@ export default function HomePage() {
                   <span className="mf-serif" style={{ fontSize: '0.7rem', color: 'rgba(232,228,220,0.2)', fontWeight: 300, letterSpacing: '.1em' }}>{plan.num}</span>
                 </div>
                 <h3 className="mf-serif" style={{ fontSize: '1.4rem', fontWeight: 400, color: '#e8e4dc', marginBottom: '0.75rem', lineHeight: 1.2 }}>{plan.label}</h3>
-                {/* Plan description increased contrast */}
-                <p style={{ fontSize: '0.85rem', color: 'rgba(232,228,220,0.7)', lineHeight: 1.65, marginBottom: '1.75rem', fontWeight: 400 }}>{plan.sub}</p>
+                <p style={{ fontSize: '0.82rem', color: 'rgba(232,228,220,0.45)', lineHeight: 1.65, marginBottom: '1.75rem', fontWeight: 300 }}>{plan.sub}</p>
                 <Link to={ROUTES.REGISTER} style={{
                   display: 'block', textAlign: 'center', padding: '0.7rem',
                   borderRadius: 10, textDecoration: 'none',
                   fontSize: '0.78rem', fontWeight: 600, letterSpacing: '.04em',
                   border: plan.featured ? 'none' : '1px solid rgba(201,168,76,0.25)',
                   background: plan.featured ? '#C9A84C' : 'transparent',
-                  color: plan.featured ? '#06060e' : 'rgba(201,168,76,0.9)',
+                  color: plan.featured ? '#06060e' : 'rgba(201,168,76,0.8)',
                   transition: 'all .2s',
                 }}>
                   Choisir →
@@ -639,7 +633,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'rgba(232,228,220,0.5)', marginTop: '2rem', letterSpacing: '.04em' }}>
+          <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'rgba(232,228,220,0.3)', marginTop: '2rem', letterSpacing: '.04em' }}>
             Les tarifs détaillés sont disponibles dans votre tableau de bord après inscription.
           </p>
         </div>
@@ -675,8 +669,7 @@ export default function HomePage() {
                   fontSize: '1.2rem', marginBottom: '1.25rem',
                 }}>{item.icon}</div>
                 <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#e8e4dc', marginBottom: '0.6rem' }}>{item.t}</h3>
-                {/* Trust item description increased contrast */}
-                <p style={{ fontSize: '0.85rem', color: 'rgba(232,228,220,0.7)', lineHeight: 1.7, fontWeight: 400 }}>{item.d}</p>
+                <p style={{ fontSize: '0.83rem', color: 'rgba(232,228,220,0.45)', lineHeight: 1.7, fontWeight: 300 }}>{item.d}</p>
               </div>
             ))}
           </div>
@@ -712,8 +705,7 @@ export default function HomePage() {
                   }}>+</div>
                 </div>
                 {openFaq === i && (
-                  /* FAQ answer increased contrast */
-                  <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'rgba(232,228,220,0.75)', lineHeight: 1.8, fontWeight: 400 }}>{faq.a}</p>
+                  <p style={{ marginTop: '1rem', fontSize: '0.88rem', color: 'rgba(232,228,220,0.55)', lineHeight: 1.8, fontWeight: 300 }}>{faq.a}</p>
                 )}
               </div>
             ))}
@@ -746,8 +738,7 @@ export default function HomePage() {
             La vérité<br /><em style={{ color: '#C9A84C', fontStyle: 'italic' }}>vous appartient</em>
           </h2>
 
-          {/* CTA description increased contrast */}
-          <p style={{ fontSize: '1rem', color: 'rgba(232,228,220,0.75)', lineHeight: 1.8, marginBottom: '2.5rem', fontWeight: 400 }}>
+          <p style={{ fontSize: '1rem', color: 'rgba(232,228,220,0.5)', lineHeight: 1.8, marginBottom: '2.5rem', fontWeight: 300 }}>
             Inscrivez-vous gratuitement et découvrez ce que Monde Fidélité peut révéler pour vous — en toute discrétion.
           </p>
 
@@ -772,15 +763,15 @@ export default function HomePage() {
             <span className="mf-serif" style={{ color: 'rgba(232,228,220,0.6)', fontSize: '0.95rem', fontWeight: 400 }}>Monde Fidélité</span>
           </div>
 
-          <p style={{ fontSize: '0.75rem', color: 'rgba(232,228,220,0.35)', letterSpacing: '.04em' }}>
+          <p style={{ fontSize: '0.75rem', color: 'rgba(232,228,220,0.25)', letterSpacing: '.04em' }}>
             © {new Date().getFullYear()} Monde Fidélité — Tous droits réservés
           </p>
 
           <div style={{ display: 'flex', gap: '2rem' }}>
             {['Confidentialité', 'Conditions', 'Contact'].map((l) => (
-              <a key={l} href="#" style={{ fontSize: '0.75rem', color: 'rgba(232,228,220,0.4)', textDecoration: 'none', letterSpacing: '.04em', transition: 'color .2s' }}
+              <a key={l} href="#" style={{ fontSize: '0.75rem', color: 'rgba(232,228,220,0.3)', textDecoration: 'none', letterSpacing: '.04em', transition: 'color .2s' }}
                 onMouseEnter={e => e.target.style.color = '#C9A84C'}
-                onMouseLeave={e => e.target.style.color = 'rgba(232,228,220,0.4)'}>
+                onMouseLeave={e => e.target.style.color = 'rgba(232,228,220,0.3)'}>
                 {l}
               </a>
             ))}
