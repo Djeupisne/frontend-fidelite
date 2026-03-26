@@ -1,7 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ROUTES } from '../constants/routes.js';
 import ProtectedRoute from './ProtectedRoute.jsx';
+import HomePage from '../pages/home/HomePage.jsx';
 import LoginPage from '../pages/auth/LoginPage.jsx';
 import RegisterPage from '../pages/auth/RegisterPage.jsx';
 import DashboardPage from '../pages/dashboard/DashboardPage.jsx';
@@ -14,13 +15,19 @@ import PlansPage from '../pages/payment/PlansPage.jsx';
 import CheckoutPage from '../pages/payment/CheckoutPage.jsx';
 import HistoryPage from '../pages/history/HistoryPage.jsx';
 import NotFoundPage from '../pages/errors/NotFoundPage.jsx';
+
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+        {/* Page d'accueil publique — redirige vers dashboard si déjà connecté */}
+        <Route path={ROUTES.HOME} element={<HomePage />} />
+
+        {/* Pages d'authentification */}
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
         <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+
+        {/* Pages protégées */}
         <Route element={<ProtectedRoute />}>
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
           <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
@@ -32,6 +39,7 @@ export default function AppRouter() {
           <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />
           <Route path={ROUTES.HISTORY} element={<HistoryPage />} />
         </Route>
+
         <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
